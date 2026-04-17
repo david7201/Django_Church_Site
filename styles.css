@@ -248,3 +248,46 @@ body {
 
 
 
+/* Donation section */
+.donation-section {
+    background-color: #f8f9fa;
+}
+
+.donation-section h2 {
+    font-weight: 400;
+    letter-spacing: 0.08em;
+}
+
+.donation-section p {
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    line-height: 1.8;
+}
+
+.donation-details {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.donation-details h5 {
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+}
+
+.donation-details p {
+    color: #000;
+    margin-bottom: 1rem;
+}
+
+.tap2tip-qr {
+    max-width: 50px;
+    width: 50px;
+    height: 50px;
+}
+
+.qr-code-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
