@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone, translation
 from django.views.generic import FormView, TemplateView
 
@@ -48,6 +49,17 @@ def page_blocks(page):
     if not page:
         return {}
     return {block.key: block for block in page.blocks.all()}
+
+
+def safe_return_url(request, fallback_name):
+    candidate = request.META.get("HTTP_REFERER", "")
+    if candidate and url_has_allowed_host_and_scheme(
+        candidate,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return candidate
+    return reverse(fallback_name)
 
 
 def primary_campaign(user):
@@ -134,7 +146,7 @@ def set_language(request, language_code):
     language_code = language_code if language_code in {"en", "ro"} else "en"
     translation.activate(language_code)
     request.session["django_language"] = language_code
-    response = redirect(request.META.get("HTTP_REFERER") or reverse("home"))
+    response = redirect(safe_return_url(request, "home"))
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language_code)
     return response
 
@@ -332,7 +344,7 @@ def newsletter_subscribe(request):
         messages.success(request, "You are subscribed to Mount Zion updates.")
     else:
         messages.error(request, "Please check the newsletter form and try again.")
-    return redirect(request.META.get("HTTP_REFERER") or reverse("home"))
+    return redirect(safe_return_url(request, "home"))
 
 
 def newsletter_unsubscribe(request, token):

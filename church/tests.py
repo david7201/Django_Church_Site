@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.cache import cache
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -200,6 +201,63 @@ class VisibilityTests(TestCase):
         self.assertNotContains(response, 'id="Word"')
         self.assertNotContains(response, 'class="signup-section"')
         self.assertNotContains(response, '<footer')
+
+
+class PublicSecurityTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        call_command("bootstrap_site", verbosity=0)
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_external_referrer_is_not_used_as_language_redirect(self):
+        response = self.client.get(
+            reverse("set_language", kwargs={"language_code": "ro"}),
+            HTTP_REFERER="https://malicious.example/phishing",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("home"))
+
+    def test_external_referrer_is_not_used_as_newsletter_redirect(self):
+        response = self.client.post(
+            reverse("newsletter_subscribe"),
+            {},
+            HTTP_REFERER="https://malicious.example/phishing",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("home"))
+
+    def test_sensitive_pages_disable_caching_and_referrer_leaks(self):
+        response = self.client.get(reverse("private_admin_login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Cache-Control"], "no-store, max-age=0")
+        self.assertEqual(response["Referrer-Policy"], "no-referrer")
+        self.assertIn("frame-ancestors 'none'", response["Content-Security-Policy"])
+        self.assertIn("camera=()", response["Permissions-Policy"])
+
+    def test_repeated_login_attempts_are_rate_limited(self):
+        login_url = reverse("login")
+        for _ in range(settings.REQUEST_RATE_LIMITS["login"][0]):
+            response = self.client.post(
+                login_url,
+                {"username": "rate-limited-user", "password": "incorrect-password"},
+            )
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            login_url,
+            {"username": "rate-limited-user", "password": "incorrect-password"},
+        )
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(
+            response["Retry-After"],
+            str(settings.REQUEST_RATE_LIMITS["login"][1]),
+        )
 
 
 class AccountAndAdminTests(TestCase):
