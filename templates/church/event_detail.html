@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% if event.show_hero %}
+    {% image_source event.cover_image event.cover_image_static as hero_image %}
+    <header class="masthead" {% if hero_image %}style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 75%, #000 100%), url('{{ hero_image }}');"{% endif %}>
+        <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase">{{ event|tr:"title" }}</h1>
+                {% if event.event_date %}<h2 class="text-white-50 mx-auto mt-2 mb-5">{{ event.event_date }}</h2>{% endif %}
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    {% if event.show_description or event.show_gallery %}
+    <section class="bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            {% if event.show_description %}
+            <article class="bg-white p-4 p-md-5 shadow-sm mb-5">
+                {% if event|tr:"summary" %}<p class="lead">{{ event|tr:"summary" }}</p>{% endif %}
+                <div class="text-black-50">{{ event|tr:"body"|linebreaks }}</div>
+            </article>
+            {% endif %}
+            {% if event_images and event.show_gallery %}
+                <div id="eventCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for event_image in event_images %}
+                            {% image_source event_image.image "" as slide_image %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ slide_image }}" class="d-block w-100 img-fluid event-slide" alt="{{ event_image.image|tr:'alt_text' }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+{% endblock %}

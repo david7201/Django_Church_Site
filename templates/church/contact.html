@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% include "church/partials/hero.html" %}
+    {% include "church/partials/sections.html" %}
+
+    {% with address_block=page_blocks.contact_address email_block=page_blocks.contact_email phone_block=page_blocks.contact_phone contact_block=page_blocks.contact_form prayer_block=page_blocks.prayer_form %}
+    {% if address_block.is_visible or email_block.is_visible or phone_block.is_visible or contact_block.is_visible or prayer_block.is_visible %}
+    <section class="church-contact-section py-5 bg-light">
+        <div class="container">
+            {% if address_block.is_visible or email_block.is_visible or phone_block.is_visible %}
+            <div class="row justify-content-center mb-5">
+                {% if address_block.is_visible %}
+                <div class="col-md-8 mb-4">
+                    <div class="contact-info bg-white p-4 rounded shadow-sm text-center">
+                        <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                        <h2>{% firstof address_block|tr:"title" "Address" %}</h2>
+                        {% for line in site_settings.address|split_lines %}
+                            <p>{{ line }}</p>
+                        {% endfor %}
+                        {% if site_settings.directions_url %}
+                            <a href="{{ site_settings.directions_url }}" target="_blank" class="btn btn-primary mt-3">{% firstof address_block|tr:"button_text" "Get Directions" %}</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if email_block.is_visible %}
+                <div class="col-md-8 mb-4">
+                    <div class="contact-info bg-white p-4 rounded shadow-sm text-center">
+                        <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                        <h2>{% firstof email_block|tr:"title" "Email" %}</h2>
+                        <p><a href="mailto:{{ site_settings.email }}" class="text-dark">{{ site_settings.email }}</a></p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if phone_block.is_visible %}
+                <div class="col-md-8 mb-4">
+                    <div class="contact-info bg-white p-4 rounded shadow-sm text-center">
+                        <i class="fas fa-phone-alt fa-2x text-primary mb-3"></i>
+                        <h2>{% firstof phone_block|tr:"title" "Phone" %}</h2>
+                        <p><a href="tel:{{ site_settings.phone }}" class="text-dark">{{ site_settings.phone }}</a></p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if contact_block.is_visible or prayer_block.is_visible %}
+            <div class="row g-4 justify-content-center">
+                {% if contact_block.is_visible %}
+                <div class="col-lg-6">
+                    <div class="bg-white p-4 shadow-sm h-100">
+                        <h2 class="h4 mb-4">{% firstof contact_block|tr:"title" "Send a Message" %}</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ contact_form.website }}
+                            {% for field in contact_form.visible_fields %}
+                                <div class="mb-3">
+                                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" name="contact_submit" class="btn btn-primary">{% firstof contact_block|tr:"button_text" "Send Message" %}</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% if prayer_block.is_visible %}
+                <div class="col-lg-6">
+                    <div class="bg-white p-4 shadow-sm h-100">
+                        <h2 class="h4 mb-4">{% firstof prayer_block|tr:"title" "Prayer Request" %}</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ prayer_form.website }}
+                            {% for field in prayer_form.visible_fields %}
+                                <div class="mb-3">
+                                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" name="prayer_submit" class="btn btn-primary">{% firstof prayer_block|tr:"button_text" "Send Prayer Request" %}</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}

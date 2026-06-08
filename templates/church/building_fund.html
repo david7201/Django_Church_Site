@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% include "church/partials/hero.html" %}
+    {% include "church/partials/sections.html" %}
+
+    {% with fundraising_block=page_blocks.fundraising tiers_block=page_blocks.giving_tiers milestones_block=page_blocks.milestones updates_block=page_blocks.updates %}
+    {% if fundraising_block.is_visible or tiers_block.is_visible or milestones_block.is_visible or updates_block.is_visible %}
+    <section class="building-section bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            {% if campaign %}
+                {% if fundraising_block.is_visible %}
+                <div class="fundraising-highlight bg-white p-4 p-md-5 shadow-sm mb-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-7">
+                            <h2 class="text-black mb-3">{% firstof fundraising_block|tr:"title" campaign|tr:"title" %}</h2>
+                            {% firstof fundraising_block|tr:"body" campaign|tr:"description" as campaign_body %}
+                            <div class="text-black-50">{{ campaign_body|linebreaks }}</div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="progress-summary">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>{{ campaign.raised_amount|currency }} {% ui "raised" %}</strong>
+                                    <span>{{ campaign.goal_amount|currency }} {% ui "goal" %}</span>
+                                </div>
+                                <div class="progress progress-large">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress_percent }}%;" aria-valuenow="{{ campaign.progress_percent }}" aria-valuemin="0" aria-valuemax="100">{{ campaign.progress_percent }}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if giving_tiers and tiers_block.is_visible %}
+                    <h2 class="text-center mb-4">{% firstof tiers_block|tr:"title" "Giving Tiers" %}</h2>
+                    <div class="row mb-5">
+                        {% for tier in giving_tiers %}
+                            <div class="col-md-4 mb-4">
+                                <div class="bg-white p-4 border border-dark h-100">
+                                    <h3 class="h5 text-uppercase">{{ tier|tr:"title" }}</h3>
+                                    <div class="giving-amount">{{ tier.amount|currency }}</div>
+                                    <div class="text-black-50">{{ tier|tr:"description"|linebreaks }}</div>
+                                    {% if tier.button_url %}
+                                        <a href="{{ tier.button_url }}" class="btn btn-primary mt-3">{% firstof tiers_block|tr:"button_text" "Give" %}</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if milestones and milestones_block.is_visible %}
+                    <h2 class="text-center mb-4">{% firstof milestones_block|tr:"title" "Construction Timeline" %}</h2>
+                    <div class="construction-stage-progress bg-white p-4 shadow-sm mb-4">
+                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                            <strong>{% firstof milestones_block|tr:"subtitle" "Construction progress" %}</strong>
+                            <span>
+                                {% if current_step %}
+                                    {% ui "step" %} {{ current_step }} {% ui "of" %} {{ total_steps }}
+                                {% else %}
+                                    {% ui "not_started" %}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="progress progress-large">
+                            <div class="progress-bar" role="progressbar" style="width: {{ construction_percent }}%;" aria-valuenow="{{ construction_percent }}" aria-valuemin="0" aria-valuemax="100">{{ construction_percent }}%</div>
+                        </div>
+                    </div>
+                    <div class="timeline mb-5">
+                        {% for milestone in milestones %}
+                            <article class="timeline-item">
+                                <div class="timeline-marker {{ milestone.display_status }}"></div>
+                                <div class="timeline-content bg-white p-4 shadow-sm">
+                                    <h3 class="h5">{{ milestone|tr:"title" }}</h3>
+                                    {% if milestone.target_date %}<p class="small text-black-50 mb-2">{% ui "target" %}: {{ milestone.target_date }}</p>{% endif %}
+                                    <div class="text-black-50">{{ milestone|tr:"description"|linebreaks }}</div>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if updates and updates_block.is_visible %}
+                    <h2 class="text-center mb-4">{% firstof updates_block|tr:"title" "Photo Updates" %}</h2>
+                    <div class="row">
+                        {% for update in updates %}
+                            {% image_source update.image update.image_static as update_image %}
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <article class="bg-white shadow-sm h-100">
+                                    {% if update_image %}
+                                        <img src="{{ update_image }}" class="img-fluid update-card-image" alt="{{ update|tr:'title' }}">
+                                    {% endif %}
+                                    <div class="p-4">
+                                        <p class="small text-black-50">{{ update.update_date }}</p>
+                                        <h3 class="h5">{{ update|tr:"title" }}</h3>
+                                        <div class="text-black-50">{{ update|tr:"body"|linebreaks }}</div>
+                                    </div>
+                                </article>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="bg-white p-5 text-center shadow-sm">{% ui "building_soon" %}</div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}

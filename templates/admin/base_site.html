@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }}{% if title %} | {% endif %}Mount Zion Admin{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="{% static 'js/admin-ui.js' %}?v=20260608c" defer></script>
+{% endblock %}
+
+{% block responsive %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/admin-friendly.css' %}?v=20260608e">
+{% endblock %}
+
+{% block branding %}
+    <a class="mz-brand" href="{% url 'admin:index' %}">
+        <span class="mz-brand-mark" aria-hidden="true">MZ</span>
+        <span class="mz-brand-copy">
+            <span class="mz-brand-title">Mount Zion Admin</span>
+            <span class="mz-brand-subtitle">Church website workspace</span>
+        </span>
+    </a>
+{% endblock %}
+
+{% block welcome-msg %}
+    <span class="mz-user-greeting">Signed in as <strong>{% firstof user.first_name user.get_username %}</strong></span>
+{% endblock %}
+
+{% block userlinks %}
+    {% if site_url %}
+        <a href="{{ site_url }}" target="_blank" rel="noopener" aria-label="View website" title="View website">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            <span>View website</span>
+        </a>
+    {% endif %}
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}" aria-label="Change password" title="Change password">
+            <i class="fa-solid fa-key" aria-hidden="true"></i>
+            <span>Password</span>
+        </a>
+    {% endif %}
+    <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+        {% csrf_token %}
+        <button type="submit" aria-label="Log out" title="Log out">
+            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+            <span>Log out</span>
+        </button>
+    </form>
+    {% include "admin/color_theme_toggle.html" %}
+{% endblock %}

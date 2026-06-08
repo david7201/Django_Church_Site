@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% include "church/partials/hero.html" %}
+    {% include "church/partials/sections.html" %}
+
+    {% with events_block=page_blocks.events_listing %}
+    {% if events_block.is_visible %}
+    <section class="events-section bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            {% if events_block|tr:"title" %}<h2 class="text-center mb-5">{{ events_block|tr:"title" }}</h2>{% endif %}
+            <div class="row">
+                {% for event in events %}
+                    {% image_source event.cover_image event.cover_image_static as event_image %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <article class="event-card bg-white shadow-sm h-100">
+                            {% if event_image %}
+                                <img src="{{ event_image }}" class="img-fluid event-card-image" alt="{{ event|tr:'title' }}">
+                            {% endif %}
+                            <div class="p-4">
+                                {% if event.event_date %}<p class="small text-black-50">{{ event.event_date }}</p>{% endif %}
+                                <h2 class="h4">{{ event|tr:"title" }}</h2>
+                                <div class="text-black-50">{{ event|tr:"summary"|linebreaks }}</div>
+                                <a href="{{ event.get_absolute_url }}" class="btn btn-primary mt-3">{% firstof events_block|tr:"button_text" "View" %}</a>
+                            </div>
+                        </article>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="bg-white p-5 text-center shadow-sm">{% ui "events_soon" %}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}

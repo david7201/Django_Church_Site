@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% include "church/partials/hero.html" %}
+    {% include "church/partials/sections.html" %}
+
+    {% with donations_block=page_blocks.donations %}
+    {% if donations_block.is_visible %}
+    <section class="donation-section bg-light py-5" id="donations">
+        <div class="container px-4 px-lg-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-9 text-center">
+                    <h2 class="text-black mb-4">{% firstof donations_block|tr:"title" "Support Our Mission" %}</h2>
+                    {% firstof donations_block|tr:"body" campaign|tr:"description" as donations_intro %}
+                    {% if donations_intro %}
+                        <p class="text-black-50 mb-4">{{ donations_intro }}</p>
+                    {% endif %}
+                    {% for method in donation_methods %}
+                        {% image_source method.qr_image method.qr_image_static as qr_image %}
+                        <div class="donation-details bg-white p-4 p-md-5 shadow-sm rounded mb-5">
+                            <h5 class="text-black mb-4">{{ method|tr:"title" }}</h5>
+                            <div class="text-black-50 mb-4">{{ method|tr:"description"|linebreaks }}</div>
+                            {% if method.details %}
+                                <div class="donation-details-list text-start mx-auto">
+                                    {% for line in method.details|split_lines %}
+                                        <p>{{ line }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if qr_image %}
+                                <div class="qr-code-wrapper text-center my-4">
+                                    <img src="{{ qr_image }}" alt="{{ method|tr:'title' }}" class="tap2tip-qr img-fluid">
+                                </div>
+                            {% endif %}
+                            {% if method.button_url and method|tr:"button_text" %}
+                                <div class="text-center mt-4">
+                                    <a href="{{ method.button_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">{{ method|tr:"button_text" }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="text-black-50">{% ui "donation_soon" %}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}

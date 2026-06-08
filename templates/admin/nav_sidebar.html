@@ -1,0 +1,45 @@
+{% load i18n %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="{% translate 'Toggle navigation' %}"></button>
+<nav class="sticky" id="nav-sidebar" aria-label="Admin navigation">
+    <input type="search" id="nav-filter" placeholder="Filter menu..." aria-label="Filter navigation items">
+
+    <p class="mz-nav-label">Overview</p>
+    <ul class="mz-nav-list">
+        <li><a href="{% url 'admin:index' %}"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i> Dashboard</a></li>
+    </ul>
+
+    <p class="mz-nav-label">Website</p>
+    <ul class="mz-nav-list">
+        {% if perms.church.view_page %}<li><a href="{% url 'admin:church_page_changelist' %}"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> Pages and sections</a></li>{% endif %}
+        {% if perms.church.view_sitesettings %}<li><a href="{% url 'admin:church_sitesettings_changelist' %}"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Site settings</a></li>{% endif %}
+        {% if perms.church.view_imageasset %}<li><a href="{% url 'admin:church_imageasset_changelist' %}"><i class="fa-regular fa-images" aria-hidden="true"></i> Image library</a></li>{% endif %}
+        {% if perms.church.view_servicetime %}<li><a href="{% url 'admin:church_servicetime_changelist' %}"><i class="fa-regular fa-clock" aria-hidden="true"></i> Service schedule</a></li>{% endif %}
+        {% if perms.church.view_teammember %}<li><a href="{% url 'admin:church_teammember_changelist' %}"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Church team</a></li>{% endif %}
+    </ul>
+
+    <p class="mz-nav-label">Communications</p>
+    <ul class="mz-nav-list">
+        {% if perms.church.view_announcement %}<li><a href="{% url 'admin:church_announcement_changelist' %}"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Announcements</a></li>{% endif %}
+        {% if perms.church.view_event %}<li><a href="{% url 'admin:church_event_changelist' %}"><i class="fa-regular fa-calendar" aria-hidden="true"></i> Events</a></li>{% endif %}
+        {% if perms.church.view_newsletterissue %}<li><a href="{% url 'admin:church_newsletterissue_changelist' %}"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i> Newsletters</a></li>{% endif %}
+        {% if perms.church.view_newslettersubscription %}<li><a href="{% url 'admin:church_newslettersubscription_changelist' %}"><i class="fa-solid fa-users" aria-hidden="true"></i> Subscribers</a></li>{% endif %}
+    </ul>
+
+    <p class="mz-nav-label">Fundraising</p>
+    <ul class="mz-nav-list">
+        {% if perms.church.view_fundraisingcampaign %}<li><a href="{% url 'admin:church_fundraisingcampaign_changelist' %}"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Building campaign</a></li>{% endif %}
+        {% if perms.church.view_donationmethod %}<li><a href="{% url 'admin:church_donationmethod_changelist' %}"><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i> Donation methods</a></li>{% endif %}
+    </ul>
+
+    <p class="mz-nav-label">Inbox</p>
+    <ul class="mz-nav-list">
+        {% if perms.church.view_contactmessage %}<li><a href="{% url 'admin:church_contactmessage_changelist' %}"><i class="fa-regular fa-message" aria-hidden="true"></i> Contact messages</a></li>{% endif %}
+        {% if perms.church.view_prayerrequest %}<li><a href="{% url 'admin:church_prayerrequest_changelist' %}"><i class="fa-regular fa-heart" aria-hidden="true"></i> Prayer requests</a></li>{% endif %}
+    </ul>
+
+    <p class="mz-nav-label">People and access</p>
+    <ul class="mz-nav-list">
+        {% if perms.auth.view_user %}<li><a href="{% url 'admin:auth_user_changelist' %}"><i class="fa-regular fa-user" aria-hidden="true"></i> Users</a></li>{% endif %}
+        {% if perms.church.view_admininvite %}<li><a href="{% url 'admin:church_admininvite_changelist' %}"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Admin invites</a></li>{% endif %}
+    </ul>
+</nav>

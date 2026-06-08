@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    {% if page.show_hero %}
+    <header class="masthead masthead-compact">
+        <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase">{{ page|tr:"hero_title" }}</h1>
+                {% if page|tr:"hero_subtitle" %}<h2 class="text-white-50 mx-auto mt-2 mb-5">{{ page|tr:"hero_subtitle" }}</h2>{% endif %}
+            </div>
+        </div>
+    </header>
+    {% endif %}
+    {% with announcements_block=page_blocks.announcements updates_block=page_blocks.building_updates %}
+    {% if announcements_block.is_visible or updates_block.is_visible %}
+    <section class="bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            {% if announcements_block.is_visible %}
+            <h2 class="mb-4">{% firstof announcements_block|tr:"title" "Announcements" %}</h2>
+            <div class="row mb-5">
+                {% for announcement in announcements %}
+                    <div class="col-md-6 mb-4">
+                        <article class="bg-white p-4 shadow-sm h-100">
+                            <p class="small text-primary">{{ announcement.get_visibility_display }}</p>
+                            <h3 class="h5">{{ announcement|tr:"title" }}</h3>
+                            <div class="text-black-50">{{ announcement|tr:"body"|linebreaks }}</div>
+                        </article>
+                    </div>
+                {% empty %}
+                    <div class="col-12"><div class="bg-white p-4 shadow-sm">{{ announcements_block|tr:"body" }}</div></div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if updates_block.is_visible %}
+            <h2 class="mb-4">{% firstof updates_block|tr:"title" "Building Updates" %}</h2>
+            <div class="row">
+                {% for update in updates %}
+                    {% image_source update.image update.image_static as update_image %}
+                    <div class="col-md-4 mb-4">
+                        <article class="bg-white shadow-sm h-100">
+                            {% if update_image %}<img src="{{ update_image }}" class="img-fluid update-card-image" alt="{{ update|tr:'title' }}">{% endif %}
+                            <div class="p-4">
+                                <p class="small text-black-50">{{ update.update_date }}</p>
+                                <h3 class="h5">{{ update|tr:"title" }}</h3>
+                                <div class="text-black-50">{{ update|tr:"body"|linebreaks }}</div>
+                            </div>
+                        </article>
+                    </div>
+                {% empty %}
+                    <div class="col-12"><div class="bg-white p-4 shadow-sm">{{ updates_block|tr:"body" }}</div></div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}

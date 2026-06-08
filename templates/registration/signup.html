@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load church_extras %}
+
+{% block content %}
+    <section class="auth-section">
+        <div class="container px-4 px-lg-5">
+            <div class="auth-card auth-card-wide">
+                <h1>{% ui "create_member_account" %}</h1>
+                <p class="text-black-50">{% ui "create_member_intro" %}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form.visible_fields %}
+                        {% if field.name == "newsletter_categories" %}
+                            <fieldset class="mb-4 newsletter-categories newsletter-categories-field">
+                                <legend class="form-label">{{ field.label }}</legend>
+                                <div class="newsletter-category-grid">
+                                    {{ field }}
+                                </div>
+                                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                                {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                            </fieldset>
+                        {% else %}
+                        <div class="mb-3">
+                            {% if field.field.widget.input_type == "checkbox" %}
+                                <label class="newsletter-consent">{{ field }} <span>{{ field.label }}</span></label>
+                            {% else %}
+                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                            {% endif %}
+                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                    <button type="submit" class="btn btn-primary">{% ui "create_account_button" %}</button>
+                </form>
+                <div class="auth-links">
+                    <a href="{% url 'login' %}">{% ui "already_have_account" %}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

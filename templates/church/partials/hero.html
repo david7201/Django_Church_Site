@@ -1,0 +1,21 @@
+{% load church_extras %}
+{% if page.show_hero %}
+    {% image_source page.hero_image page.hero_image_static as page_hero %}
+    {% image_source site_settings.hero_image site_settings.hero_image_static as site_hero %}
+    {% firstof page_hero site_hero as hero_image %}
+    <header class="masthead" {% if hero_image %}style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 75%, #000 100%), url('{{ hero_image }}');"{% endif %}>
+        <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+            <div class="d-flex justify-content-center">
+                <div class="text-center">
+                    <h1 class="mx-auto my-0 text-uppercase">{{ page|tr:"hero_title" }}</h1>
+                    {% if page|tr:"hero_subtitle" %}
+                        <h2 class="text-white-50 mx-auto mt-2 mb-5">{{ page|tr:"hero_subtitle" }}</h2>
+                    {% endif %}
+                    {% if page.hero_button_url and page|tr:"hero_button_text" %}
+                        <a class="btn btn-primary" href="{{ page.hero_button_url }}">{{ page|tr:"hero_button_text" }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+{% endif %}

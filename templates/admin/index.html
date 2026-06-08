@@ -1,0 +1,244 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static log admin_dashboard church_extras %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+{% admin_dashboard_data as dashboard %}
+<div class="mz-dashboard-header">
+    <div>
+        <p class="mz-dashboard-kicker">Mount Zion website</p>
+        <h1>Good to see you, {% firstof user.first_name user.get_username %}.</h1>
+        <p class="mz-dashboard-intro">Manage the website, church communications, fundraising updates, and messages from one place.</p>
+    </div>
+    <a class="mz-primary-action" href="{{ dashboard.home_url }}" target="_blank" rel="noopener">
+        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        View live website
+    </a>
+</div>
+
+<div class="mz-stats-grid">
+    <a class="mz-stat-card" href="{% url 'admin:church_newslettersubscription_changelist' %}">
+        <span class="mz-stat-topline">
+            Subscribers
+            <span class="mz-stat-icon"><i class="fa-regular fa-envelope" aria-hidden="true"></i></span>
+        </span>
+        <strong class="mz-stat-value">{{ dashboard.subscriber_count }}</strong>
+        <span class="mz-stat-note">Active newsletter contacts</span>
+    </a>
+    <a class="mz-stat-card" href="{% url 'admin:church_contactmessage_changelist' %}?status__exact=new">
+        <span class="mz-stat-topline">
+            New messages
+            <span class="mz-stat-icon"><i class="fa-regular fa-message" aria-hidden="true"></i></span>
+        </span>
+        <strong class="mz-stat-value">{{ dashboard.new_contact_count }}</strong>
+        <span class="mz-stat-note">Waiting for review</span>
+    </a>
+    <a class="mz-stat-card" href="{% url 'admin:church_prayerrequest_changelist' %}?status__exact=new">
+        <span class="mz-stat-topline">
+            Prayer requests
+            <span class="mz-stat-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
+        </span>
+        <strong class="mz-stat-value">{{ dashboard.new_prayer_count }}</strong>
+        <span class="mz-stat-note">New requests received</span>
+    </a>
+    <a class="mz-stat-card" href="{% url 'admin:church_fundraisingcampaign_changelist' %}">
+        <span class="mz-stat-topline">
+            Building fund
+            <span class="mz-stat-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+        </span>
+        <strong class="mz-stat-value">{{ dashboard.campaign_percent }}%</strong>
+        <span class="mz-stat-note">{{ dashboard.campaign_raised|currency }} of {{ dashboard.campaign_goal|currency }}</span>
+        <span class="mz-progress-track"><span class="mz-progress-fill" style="width: {{ dashboard.campaign_percent }}%"></span></span>
+    </a>
+</div>
+
+<div class="mz-dashboard-layout">
+    <div class="mz-dashboard-main">
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Website content</h2>
+                    <p>Keep the public pages and visual content up to date.</p>
+                </div>
+            </div>
+            <div class="mz-task-grid">
+                <a class="mz-task-card" href="{% url 'admin:church_page_changelist' %}">
+                    <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Pages and sections</span>
+                        <span class="mz-task-description">Edit headings, Romanian translations, page sections, and SEO text.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_imageasset_changelist' %}">
+                    <i class="fa-regular fa-images" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Image library</span>
+                        <span class="mz-task-description">Upload, organize, and reuse optimized photos across the website.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_servicetime_changelist' %}">
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Service schedule</span>
+                        <span class="mz-task-description">Update weekly services, opening times, and closed days.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_sitesettings_changelist' %}">
+                    <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Site settings</span>
+                        <span class="mz-task-description">Manage contact details, homepage scripture, footer, and popup.</span>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Communications</h2>
+                    <p>Publish updates and stay connected with the church community.</p>
+                </div>
+            </div>
+            <div class="mz-task-grid">
+                <a class="mz-task-card" href="{% url 'admin:church_announcement_changelist' %}">
+                    <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Announcements</span>
+                        <span class="mz-task-description">Create urgent banners and public or members-only notices.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_event_changelist' %}">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Events and galleries</span>
+                        <span class="mz-task-description">Share church activities, descriptions, photos, and slideshows.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_newsletterissue_changelist' %}">
+                    <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Newsletter composer</span>
+                        <span class="mz-task-description">Prepare bilingual emails, save drafts, and send by category.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_newslettersubscription_changelist' %}">
+                    <i class="fa-solid fa-users" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Subscriber list</span>
+                        <span class="mz-task-description">Review active subscribers, preferences, and consent status.</span>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Fundraising and building</h2>
+                    <p>Keep donors informed and the campaign progress accurate.</p>
+                </div>
+            </div>
+            <div class="mz-task-grid">
+                <a class="mz-task-card" href="{% url 'admin:church_fundraisingcampaign_changelist' %}">
+                    <i class="fa-solid fa-building-columns" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Building campaign</span>
+                        <span class="mz-task-description">Update totals, construction stage, giving tiers, and photo updates.</span>
+                    </span>
+                </a>
+                <a class="mz-task-card" href="{% url 'admin:church_donationmethod_changelist' %}">
+                    <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i>
+                    <span>
+                        <span class="mz-task-title">Donation methods</span>
+                        <span class="mz-task-description">Manage bank details, QR codes, and online giving links.</span>
+                    </span>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <aside class="mz-dashboard-secondary">
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Quick actions</h2>
+                    <p>Common tasks, one click away.</p>
+                </div>
+            </div>
+            <div class="mz-quick-actions">
+                <a href="{{ dashboard.homepage_url }}"><i class="fa-solid fa-house" aria-hidden="true"></i> Edit homepage</a>
+                <a href="{{ dashboard.announcements_add_url }}"><i class="fa-solid fa-plus" aria-hidden="true"></i> New announcement</a>
+                <a href="{{ dashboard.events_add_url }}"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i> Add an event</a>
+                <a href="{{ dashboard.newsletter_add_url }}"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Write newsletter</a>
+                <a href="{{ dashboard.images_add_url }}"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i> Upload an image</a>
+            </div>
+        </section>
+
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Needs attention</h2>
+                    <p>Items still waiting on the team.</p>
+                </div>
+            </div>
+            <div class="mz-quick-actions">
+                <a href="{% url 'admin:church_contactmessage_changelist' %}?status__exact=new">
+                    <i class="fa-regular fa-message" aria-hidden="true"></i>
+                    {{ dashboard.new_contact_count }} new message{{ dashboard.new_contact_count|pluralize }}
+                </a>
+                <a href="{% url 'admin:church_prayerrequest_changelist' %}?status__exact=new">
+                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                    {{ dashboard.new_prayer_count }} new prayer request{{ dashboard.new_prayer_count|pluralize }}
+                </a>
+                <a href="{% url 'admin:church_announcement_changelist' %}?status__exact=draft">
+                    <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+                    {{ dashboard.draft_announcement_count }} draft announcement{{ dashboard.draft_announcement_count|pluralize }}
+                </a>
+                <a href="{% url 'admin:church_event_changelist' %}?status__exact=draft">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    {{ dashboard.draft_event_count }} draft event{{ dashboard.draft_event_count|pluralize }}
+                </a>
+                <a href="{% url 'admin:church_newsletterissue_changelist' %}?status__exact=draft">
+                    <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    {{ dashboard.draft_newsletter_count }} draft newsletter{{ dashboard.draft_newsletter_count|pluralize }}
+                </a>
+            </div>
+        </section>
+
+        <section class="mz-panel">
+            <div class="mz-panel-header">
+                <div>
+                    <h2>Recent activity</h2>
+                    <p>Your latest admin changes.</p>
+                </div>
+            </div>
+            {% get_admin_log 7 as admin_log for_user user %}
+            {% if admin_log %}
+                <ul class="mz-recent-list">
+                    {% for entry in admin_log %}
+                        <li>
+                            {% if entry.is_deletion or not entry.get_admin_url %}
+                                {{ entry.object_repr }}
+                            {% else %}
+                                <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                            {% endif %}
+                            <span class="mz-recent-meta">{{ entry.content_type.name|capfirst }} · {{ entry.action_time|timesince }} ago</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="mz-empty-state">Your recent changes will appear here.</p>
+            {% endif %}
+        </section>
+    </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% load church_extras %}
+<form method="post" action="{% url 'newsletter_subscribe' %}" class="newsletter-form">
+    {% csrf_token %}
+    {{ newsletter_form.website }}
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="{{ newsletter_form.name.id_for_label }}" class="form-label">{% ui "name" %}</label>
+            {{ newsletter_form.name }}
+        </div>
+        <div class="col-md-4">
+            <label for="{{ newsletter_form.email.id_for_label }}" class="form-label">{% ui "email" %}</label>
+            {{ newsletter_form.email }}
+        </div>
+        <div class="col-md-4">
+            <label for="{{ newsletter_form.preferred_language.id_for_label }}" class="form-label">{% ui "language" %}</label>
+            {{ newsletter_form.preferred_language }}
+        </div>
+    </div>
+    <div class="newsletter-categories mt-4">
+        <div class="form-label">{% ui "choose_updates" %}</div>
+        {{ newsletter_form.categories }}
+    </div>
+    <label class="newsletter-consent mt-3">
+        {{ newsletter_form.consent_given }}
+        <span>{{ newsletter_form.consent_given.label }}</span>
+    </label>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{% ui "subscribe" %}</button>
+    </div>
+</form>

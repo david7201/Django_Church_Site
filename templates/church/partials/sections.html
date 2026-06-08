@@ -1,0 +1,68 @@
+{% load church_extras %}
+{% if sections %}
+    <section class="dynamic-sections bg-light py-5">
+        <div class="container px-4 px-lg-5">
+            <div class="dynamic-section-stack">
+                {% for section in sections %}
+                    {% if section.layout != "value_card" %}
+                        {% if section.layout == "dark_band" %}
+                        <div class="mb-4">
+                            <div class="dynamic-band bg-black text-center text-white p-5">
+                                <h2 class="mb-4">{{ section|tr:"title" }}</h2>
+                                <div class="text-white-50">{{ section|tr:"body"|linebreaks }}</div>
+                                {% if section.button_url and section|tr:"button_text" %}
+                                    <a href="{{ section.button_url }}" class="btn btn-primary mt-3">{{ section|tr:"button_text" }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% elif section.layout == "image_text" %}
+                        {% image_source section.image section.image_static as section_image %}
+                        <div class="mb-5">
+                            <div class="row gx-0 align-items-stretch">
+                                {% if section_image %}
+                                    <div class="col-lg-6">
+                                        <img src="{{ section_image }}" class="img-fluid section-image" alt="{{ section|tr:'title' }}">
+                                    </div>
+                                {% endif %}
+                                <div class="{% if section_image %}col-lg-6{% else %}col-lg-10 mx-auto{% endif %}">
+                                    <div class="bg-white border border-dark p-4 h-100">
+                                        <h2 class="text-uppercase mb-4">{{ section|tr:"title" }}</h2>
+                                        <div class="text-black-50">{{ section|tr:"body"|linebreaks }}</div>
+                                        {% if section.button_url and section|tr:"button_text" %}
+                                            <a href="{{ section.button_url }}" class="btn btn-primary mt-3">{{ section|tr:"button_text" }}</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <article class="dynamic-text-card bg-white text-black p-4 rounded border border-dark mb-4">
+                                <h2 class="text-uppercase mb-4">{{ section|tr:"title" }}</h2>
+                                <div class="text-black-50">{{ section|tr:"body"|linebreaks }}</div>
+                                {% if section.button_url and section|tr:"button_text" %}
+                                    <a href="{{ section.button_url }}" class="btn btn-primary mt-3">{{ section|tr:"button_text" }}</a>
+                                {% endif %}
+                        </article>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="row g-4 justify-content-center dynamic-value-grid">
+                {% for section in sections %}
+                    {% if section.layout == "value_card" %}
+                        <div class="col-lg-4 col-md-6">
+                            <article class="dynamic-value-card bg-white text-black p-4 rounded border border-dark h-100">
+                                <h2 class="h5 text-uppercase mb-4">{{ section|tr:"title" }}</h2>
+                                <div class="text-black-50">{{ section|tr:"body"|linebreaks }}</div>
+                                {% if section.button_url and section|tr:"button_text" %}
+                                    <a href="{{ section.button_url }}" class="btn btn-primary mt-3">{{ section|tr:"button_text" }}</a>
+                                {% endif %}
+                            </article>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}

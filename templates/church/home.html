@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static church_extras %}
+
+{% block content %}
+    {% with popup=page_blocks.construction_popup %}
+    {% if popup.is_visible %}
+        <div id="disclaimerPopup" class="popup-container">
+            <div class="popup-content">
+                        <h2>{% firstof popup|tr:"title" site_settings|tr:"construction_popup_title" %}</h2>
+                        <p>{% firstof popup|tr:"body" site_settings|tr:"construction_popup_body" %}</p>
+                        <div class="buttons-container">
+                    <button onclick="closeDisclaimer()" class="continue-btn" type="button">{% ui "accept" %}</button>
+                    {% if popup.button_url %}
+                        <a href="{{ popup.button_url }}" class="reject-btn">{% firstof popup|tr:"button_text" site_settings|tr:"construction_popup_button" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    {% include "church/partials/hero.html" %}
+
+    {% with scripture=page_blocks.scripture %}
+    {% if scripture.is_visible %}
+        <section class="about-section text-center" id="Word">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-lg-8">
+                        <h2 class="text-white mb-4">{% firstof scripture|tr:"title" site_settings|tr:"scripture_reference" %}</h2>
+                        <p class="text-white-50">
+                            {% firstof scripture|tr:"body" site_settings|tr:"scripture_text" %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+    {% endwith %}
+
+    <section class="projects-section bg-light" id="projects">
+        <div class="container px-4 px-lg-5">
+            {% with schedule=page_blocks.service_schedule %}
+            {% if schedule.is_visible %}
+                <div class="row gx-0 mb-5 align-items-center">
+                    {% image_source schedule.image schedule.image_static as schedule_image %}
+                    <div class="col-xl-8 col-lg-7">
+                        <img class="img-fluid mb-3 mb-lg-0" src="{% firstof schedule_image '/static/assets/img/bg-masthead.jpg' %}" alt="{% firstof schedule|tr:'title' 'Mount Zion church' %}" />
+                    </div>
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="featured-text text-center text-lg-left">
+                            <h4>{% firstof schedule|tr:"title" "Church Opening Hours" %}</h4>
+                            <div class="opening-hours">
+                                <ul>
+                                    {% for service in service_times %}
+                                        <li>
+                                            <span class="day">{{ service|tr:"day" }}:</span>
+                                            <span class="hours">
+                                                {% if service.is_closed %}
+                                                    {% ui "closed" %}
+                                                {% else %}
+                                                    {% firstof service|tr:"service_name" "" %} {{ service.time_text }}
+                                                {% endif %}
+                                            </span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% endwith %}
+
+            {% if sections %}
+                <div class="row justify-content-center mb-5">
+                    {% for section in sections %}
+                        {% if section.layout == "dark_band" %}
+                            <div class="col-12 mb-4">
+                                <div class="dynamic-band bg-black text-center text-white p-5">
+                                    <h2 class="mb-4">{{ section|tr:"title" }}</h2>
+                                    <div class="text-white-50">{{ section|tr:"body"|linebreaks }}</div>
+                                    {% if section.button_url and section|tr:"button_text" %}
+                                        <a class="btn btn-primary btn-lg" href="{{ section.button_url }}">{{ section|tr:"button_text" }}</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% with fundraising=page_blocks.fundraising %}
+            {% if campaign and fundraising.is_visible %}
+                <div class="fundraising-highlight bg-white p-4 p-md-5 shadow-sm mb-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-7">
+                            <h2 class="text-black mb-3">{% firstof fundraising|tr:"title" campaign|tr:"title" %}</h2>
+                            <div class="text-black-50">{% firstof fundraising|tr:"body" campaign|tr:"description" as fundraising_body %}{{ fundraising_body|linebreaks }}</div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="progress-summary">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>{{ campaign.raised_amount|currency }} {% ui "raised" %}</strong>
+                                    <span>{{ campaign.goal_amount|currency }} {% ui "goal" %}</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress_percent }}%;" aria-valuenow="{{ campaign.progress_percent }}" aria-valuemin="0" aria-valuemax="100">{{ campaign.progress_percent }}%</div>
+                                </div>
+                                <a class="btn btn-primary mt-4" href="{% firstof fundraising.button_url '/building-fund/' %}">{% firstof fundraising|tr:"button_text" "Building Fund" %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% endwith %}
+
+            {% with latest=page_blocks.latest_update %}
+            {% if featured_update and latest.is_visible %}
+                {% image_source featured_update.image featured_update.image_static as update_image %}
+                <div class="row gx-0 mb-5 justify-content-center">
+                    {% if update_image %}
+                        <div class="col-lg-6"><img src="{{ update_image }}" class="img-fluid update-image" alt="{{ featured_update|tr:'title' }}"></div>
+                    {% endif %}
+                    <div class="{% if update_image %}col-lg-6{% else %}col-lg-10{% endif %}">
+                        <div class="bg-black text-center h-100 project">
+                            <div class="d-flex h-100">
+                                <div class="project-text w-100 my-auto text-center text-lg-left">
+                                    <p class="text-primary mb-2">{% firstof latest|tr:"title" "Latest update" %}</p>
+                                    <h4 class="text-white">{{ featured_update|tr:"title" }}</h4>
+                                    <div class="mb-0 text-white-50">{{ featured_update|tr:"body"|linebreaks }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </section>
+
+    {% with team_block=page_blocks.team %}
+    {% if team_members and team_block.is_visible %}
+        <section class="team-section py-5 bg-light">
+            <div class="container">
+                <h2 class="team-title text-center mb-5">{% firstof team_block|tr:"title" "Meet Our Team" %}</h2>
+                <div class="row justify-content-center">
+                    {% for member in team_members %}
+                        {% image_source member.photo "" as member_photo %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="team-member bg-white p-4 rounded shadow-sm text-center">
+                                {% if member_photo %}
+                                    <div class="team-img mb-3">
+                                        <img src="{{ member_photo }}" alt="{{ member.name }}" class="img-fluid rounded-top">
+                                    </div>
+                                {% endif %}
+                                <div class="team-info">
+                                    <div class="team-name">{{ member.name }}</div>
+                                    <div class="team-role">{{ member|tr:"role" }}</div>
+                                    {% if member|tr:"bio" %}<p class="text-black-50 mt-3">{{ member|tr:"bio" }}</p>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+    {% endwith %}
+
+    {% with newsletter=page_blocks.newsletter %}
+    {% if newsletter.is_visible %}
+        <section class="signup-section">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-lg-9 text-center text-white">
+                        <i class="far fa-paper-plane fa-2x mb-4"></i>
+                        <h2 class="mb-4">{% firstof newsletter|tr:"title" "Subscribe for church updates" %}</h2>
+                        <p class="text-white-50 mb-5">{% firstof newsletter|tr:"body" "" %}</p>
+                        {% include "church/partials/newsletter_form.html" %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+    {% endwith %}
+
+    {% with address_block=page_blocks.home_address email_block=page_blocks.home_email phone_block=page_blocks.home_phone %}
+    {% if address_block.is_visible or email_block.is_visible or phone_block.is_visible %}
+        <section class="contact-section bg-black">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5">
+                {% if address_block.is_visible %}
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="card py-4 h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-map-marked-alt text-primary mb-2"></i>
+                                <h4 class="text-uppercase m-0">{% firstof address_block|tr:"title" "Address" %}</h4>
+                            <hr class="my-4 mx-auto" />
+                            <div class="small text-black-50">
+                                {% for line in site_settings.address|split_lines %}
+                                    <p>{{ line }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if email_block.is_visible %}
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="card py-4 h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-envelope text-primary mb-2"></i>
+                                <h4 class="text-uppercase m-0">{% firstof email_block|tr:"title" "Email" %}</h4>
+                            <hr class="my-4 mx-auto" />
+                            <div class="small text-black-50"><a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a></div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if phone_block.is_visible %}
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="card py-4 h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-mobile-alt text-primary mb-2"></i>
+                                <h4 class="text-uppercase m-0">{% firstof phone_block|tr:"title" "Phone" %}</h4>
+                            <hr class="my-4 mx-auto" />
+                            <div class="small text-black-50">{{ site_settings.phone }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+    {% endwith %}
+{% endblock %}
