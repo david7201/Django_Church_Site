@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -268,6 +268,46 @@ class PublicSecurityTests(TestCase):
             response["Retry-After"],
             str(settings.REQUEST_RATE_LIMITS["login"][1]),
         )
+
+    @override_settings(DEBUG=True, ALLOWED_HOSTS=["localhost"])
+    def test_null_origin_is_accepted_only_for_loopback_development(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        login_url = reverse("private_admin_login")
+        csrf_client.get(login_url, HTTP_HOST="localhost")
+        token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            login_url,
+            {
+                "username": "unknown-admin",
+                "password": "incorrect-password",
+                "csrfmiddlewaretoken": token,
+            },
+            HTTP_HOST="localhost",
+            HTTP_ORIGIN="null",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=["localhost"])
+    def test_null_origin_remains_rejected_in_production(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        login_url = reverse("private_admin_login")
+        csrf_client.get(login_url, HTTP_HOST="localhost")
+        token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            login_url,
+            {
+                "username": "unknown-admin",
+                "password": "incorrect-password",
+                "csrfmiddlewaretoken": token,
+            },
+            HTTP_HOST="localhost",
+            HTTP_ORIGIN="null",
+        )
+
+        self.assertEqual(response.status_code, 403)
 
 
 class AccountAndAdminTests(TestCase):

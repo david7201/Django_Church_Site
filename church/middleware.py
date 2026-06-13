@@ -1,9 +1,29 @@
 import hashlib
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils import translation
+
+
+class LocalDevelopmentOriginMiddleware:
+    """Handle Origin: null from local embedded browsers without weakening production."""
+
+    LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        hostname = urlsplit(f"//{request.get_host()}").hostname
+        if (
+            settings.DEBUG
+            and hostname in self.LOOPBACK_HOSTS
+            and request.META.get("HTTP_ORIGIN") == "null"
+        ):
+            request.META.pop("HTTP_ORIGIN")
+        return self.get_response(request)
 
 
 class SecurityHeadersMiddleware:

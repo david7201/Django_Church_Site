@@ -80,6 +80,7 @@ MIDDLEWARE = [
     "django.middleware.locale.LocaleMiddleware",
     "church.middleware.AdminEnglishMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "church.middleware.LocalDevelopmentOriginMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "church.middleware.RateLimitMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
