@@ -23,7 +23,19 @@ from church.page_blocks import PAGE_BLOCK_DEFAULTS
 class Command(BaseCommand):
     help = "Create starter content for the Mount Zion website."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--if-empty",
+            action="store_true",
+            help="Create starter content only when the site has no pages.",
+        )
+
     def handle(self, *args, **options):
+        if options["if_empty"] and Page.objects.exists():
+            if options.get("verbosity", 1) > 0:
+                self.stdout.write("Existing website content was left unchanged.")
+            return
+
         self.create_settings()
         self.create_pages()
         self.create_service_times()

@@ -35,6 +35,16 @@ class BootstrapContentTests(TestCase):
         self.assertTrue(Page.objects.filter(slug="building").exists())
         self.assertTrue(Page.objects.filter(slug="member-updates").exists())
 
+    def test_if_empty_bootstrap_does_not_overwrite_admin_content(self):
+        home = Page.objects.get(slug="home")
+        home.hero_title_en = "Admin-edited homepage title"
+        home.save(update_fields=["hero_title_en"])
+
+        call_command("bootstrap_site", if_empty=True, verbosity=0)
+
+        home.refresh_from_db()
+        self.assertEqual(home.hero_title_en, "Admin-edited homepage title")
+
     def test_every_fixed_page_area_is_present_as_an_admin_block(self):
         expected_blocks = {
             "home": {

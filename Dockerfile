@@ -16,4 +16,4 @@ COPY . /code/
 
 EXPOSE 8000
 
-CMD ["gunicorn", "mount_zion.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py bootstrap_site --if-empty && exec gunicorn mount_zion.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
