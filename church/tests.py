@@ -148,6 +148,15 @@ class BootstrapContentTests(TestCase):
         statuses = list(campaign.milestones.values_list("milestone_status", flat=True))
         self.assertEqual(statuses, ["done", "done", "in_progress", "planned"])
 
+    def test_support_the_build_button_links_to_charity_donations(self):
+        response = self.client.get(reverse("building_fund"))
+
+        self.assertContains(response, 'href="/charity/#donations"')
+        self.assertContains(response, "Support the Build")
+
+        charity_response = self.client.get(reverse("charity"))
+        self.assertContains(charity_response, 'href="#donations"')
+
 
 class VisibilityTests(TestCase):
     def setUp(self):

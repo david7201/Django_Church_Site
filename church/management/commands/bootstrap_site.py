@@ -163,7 +163,7 @@ class Command(BaseCommand):
             hero_subtitle_ro="Ajută-ne să construim o casă permanentă pentru închinare și comunitate.",
             hero_button_text_en="Support the Build",
             hero_button_text_ro="Susține construcția",
-            hero_button_url="#donations",
+            hero_button_url="/charity/#donations",
             meta_title_en="Building Fund - Mount Zion Church",
             meta_title_ro="Fondul de construcție - Biserica Mount Zion",
             meta_description_en="Follow progress and support the new Mount Zion church building.",
