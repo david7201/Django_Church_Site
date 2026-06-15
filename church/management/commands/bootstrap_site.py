@@ -31,7 +31,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options["if_empty"] and Page.objects.exists():
+        if options["if_empty"] and Page.objects.filter(slug="home").exists():
             if options.get("verbosity", 1) > 0:
                 self.stdout.write("Existing website content was left unchanged.")
             return

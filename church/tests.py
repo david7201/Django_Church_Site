@@ -45,6 +45,15 @@ class BootstrapContentTests(TestCase):
         home.refresh_from_db()
         self.assertEqual(home.hero_title_en, "Admin-edited homepage title")
 
+    def test_if_empty_bootstrap_repairs_database_with_only_member_page(self):
+        Page.objects.exclude(slug="member-updates").delete()
+
+        call_command("bootstrap_site", if_empty=True, verbosity=0)
+
+        self.assertTrue(Page.objects.filter(slug="home").exists())
+        self.assertTrue(Page.objects.filter(slug="about").exists())
+        self.assertTrue(Page.objects.filter(slug="services").exists())
+
     def test_every_fixed_page_area_is_present_as_an_admin_block(self):
         expected_blocks = {
             "home": {
