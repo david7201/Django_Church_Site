@@ -308,9 +308,9 @@ class PublicSecurityTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(DEBUG=False, ALLOWED_HOSTS=["localhost"])
-    def test_null_origin_remains_rejected_in_production(self):
+    def test_null_origin_is_accepted_for_private_admin_with_csrf_token(self):
         csrf_client = Client(enforce_csrf_checks=True)
-        login_url = reverse("private_admin_login")
+        login_url = f"/{settings.PRIVATE_ADMIN_PREFIX}/dashboard/login/"
         csrf_client.get(login_url, HTTP_HOST="localhost")
         token = csrf_client.cookies["csrftoken"].value
 
@@ -323,6 +323,46 @@ class PublicSecurityTests(TestCase):
             },
             HTTP_HOST="localhost",
             HTTP_ORIGIN="null",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=["localhost"])
+    def test_null_origin_remains_rejected_for_public_login_in_production(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        login_url = reverse("login")
+        csrf_client.get(login_url, HTTP_HOST="localhost")
+        token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            login_url,
+            {
+                "username": "unknown-member",
+                "password": "incorrect-password",
+                "csrfmiddlewaretoken": token,
+            },
+            HTTP_HOST="localhost",
+            HTTP_ORIGIN="null",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=["localhost"])
+    def test_external_origin_remains_rejected_for_private_admin_in_production(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        login_url = f"/{settings.PRIVATE_ADMIN_PREFIX}/dashboard/login/"
+        csrf_client.get(login_url, HTTP_HOST="localhost")
+        token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            login_url,
+            {
+                "username": "unknown-admin",
+                "password": "incorrect-password",
+                "csrfmiddlewaretoken": token,
+            },
+            HTTP_HOST="localhost",
+            HTTP_ORIGIN="https://malicious.example",
         )
 
         self.assertEqual(response.status_code, 403)

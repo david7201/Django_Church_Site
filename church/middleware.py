@@ -8,19 +8,22 @@ from django.utils import translation
 
 
 class LocalDevelopmentOriginMiddleware:
-    """Handle Origin: null from local embedded browsers without weakening production."""
+    """Handle Origin: null where the browser still submits a valid CSRF token."""
 
     LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
 
     def __init__(self, get_response):
         self.get_response = get_response
+        self.private_prefix = f"/{settings.PRIVATE_ADMIN_PREFIX}/"
 
     def __call__(self, request):
         hostname = urlsplit(f"//{request.get_host()}").hostname
         if (
-            settings.DEBUG
-            and hostname in self.LOOPBACK_HOSTS
-            and request.META.get("HTTP_ORIGIN") == "null"
+            request.META.get("HTTP_ORIGIN") == "null"
+            and (
+                request.path.startswith(self.private_prefix)
+                or (settings.DEBUG and hostname in self.LOOPBACK_HOSTS)
+            )
         ):
             request.META.pop("HTTP_ORIGIN")
         return self.get_response(request)
