@@ -157,6 +157,16 @@ class BootstrapContentTests(TestCase):
         charity_response = self.client.get(reverse("charity"))
         self.assertContains(charity_response, 'href="#donations"')
 
+    def test_home_service_schedule_renders_as_structured_rows(self):
+        response = self.client.get(reverse("home"))
+
+        self.assertContains(response, 'class="featured-text service-schedule-card"')
+        self.assertContains(response, 'class="service-schedule-list"')
+        self.assertContains(response, 'class="service-entry"')
+        self.assertContains(response, "Morning Service 9:00 - 12:00")
+        self.assertContains(response, "Evening Service")
+        self.assertNotContains(response, "| Evening Service")
+
 
 class VisibilityTests(TestCase):
     def setUp(self):

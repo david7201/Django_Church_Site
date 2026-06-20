@@ -396,6 +396,13 @@ def split_lines(value):
 
 
 @register.filter
+def split_pipe(value):
+    if not value:
+        return []
+    return [part.strip() for part in str(value).split("|") if part.strip()]
+
+
+@register.filter
 def currency(value):
     if value is None:
         return "€0"

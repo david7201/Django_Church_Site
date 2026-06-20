@@ -42,24 +42,40 @@
         <div class="container px-4 px-lg-5">
             {% with schedule=page_blocks.service_schedule %}
             {% if schedule.is_visible %}
-                <div class="row gx-0 mb-5 align-items-center">
+                <div class="row gx-0 mb-5 align-items-stretch service-schedule-feature">
                     {% image_source schedule.image schedule.image_static as schedule_image %}
-                    <div class="col-xl-8 col-lg-7">
-                        <img class="img-fluid mb-3 mb-lg-0" src="{% firstof schedule_image '/static/assets/img/bg-masthead.jpg' %}" alt="{% firstof schedule|tr:'title' 'Mount Zion church' %}" />
+                    <div class="col-xl-7 col-lg-6 service-schedule-media">
+                        <img class="img-fluid service-schedule-image" src="{% firstof schedule_image '/static/assets/img/bg-masthead.jpg' %}" alt="{% firstof schedule|tr:'title' 'Mount Zion church' %}" />
                     </div>
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="featured-text text-center text-lg-left">
-                            <h4>{% firstof schedule|tr:"title" "Church Opening Hours" %}</h4>
+                    <div class="col-xl-5 col-lg-6">
+                        <div class="featured-text service-schedule-card">
+                            <h4 class="service-schedule-title">{% firstof schedule|tr:"title" "Church Opening Hours" %}</h4>
                             <div class="opening-hours">
-                                <ul>
+                                <ul class="service-schedule-list">
                                     {% for service in service_times %}
-                                        <li>
-                                            <span class="day">{{ service|tr:"day" }}:</span>
+                                        <li class="{% if service.is_closed %}is-closed{% endif %}">
+                                            <span class="day">{{ service|tr:"day" }}</span>
                                             <span class="hours">
                                                 {% if service.is_closed %}
-                                                    {% ui "closed" %}
+                                                    <span class="service-status service-status-closed">{% ui "closed" %}</span>
                                                 {% else %}
-                                                    {% firstof service|tr:"service_name" "" %} {{ service.time_text }}
+                                                    {% firstof service|tr:"service_name" "" as service_name %}
+                                                    <span class="service-lines">
+                                                        {% if service_name %}
+                                                            {% for segment in service_name|split_pipe %}
+                                                                <span class="service-entry">
+                                                                    <span class="service-name">{{ segment }}</span>
+                                                                    {% if forloop.last and service.time_text %}
+                                                                        <span class="service-time">{{ service.time_text }}</span>
+                                                                    {% endif %}
+                                                                </span>
+                                                            {% endfor %}
+                                                        {% elif service.time_text %}
+                                                            <span class="service-entry">
+                                                                <span class="service-time">{{ service.time_text }}</span>
+                                                            </span>
+                                                        {% endif %}
+                                                    </span>
                                                 {% endif %}
                                             </span>
                                         </li>
