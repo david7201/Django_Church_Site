@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n %}
+{% load i18n church_extras %}
 
 {% block after_field_sets %}
     {{ block.super }}
@@ -9,11 +9,11 @@
                 <i class="fa-solid fa-envelope"></i>
             </div>
             <div>
-                <strong>Email reply</strong>
+                <strong>{% ui "admin_email_reply" %}</strong>
                 {% if original.email %}
-                    <p>The reply will be sent to <strong>{{ original.email }}</strong> from the church mailbox.</p>
+                    <p>{% ui "admin_reply_will_send_to" %} <strong>{{ original.email }}</strong> {% ui "admin_from_church_mailbox" %}</p>
                 {% else %}
-                    <p>No email address was provided, so this request cannot receive an email reply.</p>
+                    <p>{% ui "admin_no_email_reply" %}</p>
                 {% endif %}
             </div>
         </section>
@@ -24,12 +24,14 @@
     {{ block.super }}
     {% if original and original.email and has_change_permission %}
         <div class="submit-row mz-send-email-row">
+            {% ui "admin_save_send_email_reply" as save_send_email_reply_label %}
+            {% ui "admin_confirm_send_email_reply" as confirm_send_email_reply_label %}
             <input
                 type="submit"
-                value="Save and send email reply"
+                value="{{ save_send_email_reply_label }}"
                 name="_send_email_reply"
                 class="default"
-                onclick="return window.confirm('Send this email reply now?');"
+                onclick="return window.confirm('{{ confirm_send_email_reply_label|escapejs }}');"
             >
         </div>
     {% endif %}

@@ -52,7 +52,7 @@ def page_blocks(page):
 
 
 def safe_return_url(request, fallback_name):
-    candidate = request.META.get("HTTP_REFERER", "")
+    candidate = request.GET.get("next") or request.META.get("HTTP_REFERER", "")
     if candidate and url_has_allowed_host_and_scheme(
         candidate,
         allowed_hosts={request.get_host()},

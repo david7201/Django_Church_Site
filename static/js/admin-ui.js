@@ -1,6 +1,13 @@
 (function () {
     "use strict";
 
+    function text(key, fallback) {
+        if (window.MZ_ADMIN_I18N && window.MZ_ADMIN_I18N[key]) {
+            return window.MZ_ADMIN_I18N[key];
+        }
+        return fallback;
+    }
+
     function enhanceNavigation() {
         var currentPath = window.location.pathname;
         var main = document.getElementById("main");
@@ -92,7 +99,7 @@
             if (
                 action &&
                 action.value === "send_newsletters" &&
-                !window.confirm("Send the selected newsletter now? This will email matching subscribers.")
+                !window.confirm(text("confirmSendNewsletter", "Send the selected newsletter now? This will email matching subscribers."))
             ) {
                 event.preventDefault();
             }
@@ -106,11 +113,11 @@
             checkbox.classList.add("mz-visibility-toggle");
             checkbox.setAttribute(
                 "aria-label",
-                checkbox.checked ? "Shown on website" : "Hidden from website"
+                checkbox.checked ? text("shownOnWebsite", "Shown on website") : text("hiddenFromWebsite", "Hidden from website")
             );
             checkbox.title = checkbox.checked
-                ? "Shown on website. Switch off to hide."
-                : "Hidden from website. Switch on to show.";
+                ? text("shownOnWebsiteTitle", "Shown on website. Switch off to hide.")
+                : text("hiddenFromWebsiteTitle", "Hidden from website. Switch on to show.");
 
             var row = checkbox.closest(".form-row");
             var state = row ? row.querySelector(".mz-visibility-state") : null;
@@ -123,13 +130,13 @@
             function updateState() {
                 checkbox.setAttribute(
                     "aria-label",
-                    checkbox.checked ? "Shown on website" : "Hidden from website"
+                    checkbox.checked ? text("shownOnWebsite", "Shown on website") : text("hiddenFromWebsite", "Hidden from website")
                 );
                 checkbox.title = checkbox.checked
-                    ? "Shown on website. Switch off to hide."
-                    : "Hidden from website. Switch on to show.";
+                    ? text("shownOnWebsiteTitle", "Shown on website. Switch off to hide.")
+                    : text("hiddenFromWebsiteTitle", "Hidden from website. Switch on to show.");
                 if (state) {
-                    state.textContent = checkbox.checked ? "Visible" : "Hidden";
+                    state.textContent = checkbox.checked ? text("visible", "Visible") : text("hidden", "Hidden");
                     state.classList.toggle("is-hidden", !checkbox.checked);
                 }
             }

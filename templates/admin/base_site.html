@@ -1,51 +1,78 @@
 {% extends "admin/base.html" %}
-{% load i18n static %}
+{% load i18n static church_extras %}
 
-{% block title %}{{ title }}{% if title %} | {% endif %}Mount Zion Admin{% endblock %}
+{% block title %}{{ title }}{% if title %} | {% endif %}{% ui "admin_brand_title" %}{% endblock %}
 
 {% block extrahead %}
     {{ block.super }}
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script src="{% static 'js/admin-ui.js' %}?v=20260608c" defer></script>
+    {% ui "admin_confirm_send_newsletter" as confirm_send_newsletter %}
+    {% ui "admin_shown_on_website" as shown_on_website %}
+    {% ui "admin_hidden_from_website" as hidden_from_website %}
+    {% ui "admin_shown_on_website_title" as shown_on_website_title %}
+    {% ui "admin_hidden_from_website_title" as hidden_from_website_title %}
+    {% ui "admin_visible" as visible_label %}
+    {% ui "admin_hidden" as hidden_label %}
+    <script>
+        window.MZ_ADMIN_I18N = {
+            confirmSendNewsletter: "{{ confirm_send_newsletter|escapejs }}",
+            shownOnWebsite: "{{ shown_on_website|escapejs }}",
+            hiddenFromWebsite: "{{ hidden_from_website|escapejs }}",
+            shownOnWebsiteTitle: "{{ shown_on_website_title|escapejs }}",
+            hiddenFromWebsiteTitle: "{{ hidden_from_website_title|escapejs }}",
+            visible: "{{ visible_label|escapejs }}",
+            hidden: "{{ hidden_label|escapejs }}"
+        };
+    </script>
+    <script src="{% static 'js/admin-ui.js' %}?v=20260620a" defer></script>
 {% endblock %}
 
 {% block responsive %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/admin-friendly.css' %}?v=20260608e">
+    <link rel="stylesheet" href="{% static 'css/admin-friendly.css' %}?v=20260620a">
 {% endblock %}
 
 {% block branding %}
     <a class="mz-brand" href="{% url 'admin:index' %}">
         <span class="mz-brand-mark" aria-hidden="true">MZ</span>
         <span class="mz-brand-copy">
-            <span class="mz-brand-title">Mount Zion Admin</span>
-            <span class="mz-brand-subtitle">Church website workspace</span>
+            <span class="mz-brand-title">{% ui "admin_brand_title" %}</span>
+            <span class="mz-brand-subtitle">{% ui "admin_brand_subtitle" %}</span>
         </span>
     </a>
 {% endblock %}
 
 {% block welcome-msg %}
-    <span class="mz-user-greeting">Signed in as <strong>{% firstof user.first_name user.get_username %}</strong></span>
+    <span class="mz-user-greeting">{% ui "admin_signed_in_as" %} <strong>{% firstof user.first_name user.get_username %}</strong></span>
 {% endblock %}
 
 {% block userlinks %}
+    {% ui "language" as language_label %}
+    <span class="mz-admin-language-switcher" aria-label="{{ language_label }}">
+        <a href="{% url 'set_language' 'en' %}?next={{ request.get_full_path|urlencode }}" class="{% if current_language == 'en' %}is-active{% endif %}" lang="en">EN</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'set_language' 'ro' %}?next={{ request.get_full_path|urlencode }}" class="{% if current_language == 'ro' %}is-active{% endif %}" lang="ro">RO</a>
+    </span>
     {% if site_url %}
-        <a href="{{ site_url }}" target="_blank" rel="noopener" aria-label="View website" title="View website">
+        {% ui "admin_view_website" as view_website_label %}
+        <a href="{{ site_url }}" target="_blank" rel="noopener" aria-label="{{ view_website_label }}" title="{{ view_website_label }}">
             <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-            <span>View website</span>
+            <span>{{ view_website_label }}</span>
         </a>
     {% endif %}
     {% if user.has_usable_password %}
-        <a href="{% url 'admin:password_change' %}" aria-label="Change password" title="Change password">
+        {% ui "admin_password" as password_label %}
+        <a href="{% url 'admin:password_change' %}" aria-label="{{ password_label }}" title="{{ password_label }}">
             <i class="fa-solid fa-key" aria-hidden="true"></i>
-            <span>Password</span>
+            <span>{{ password_label }}</span>
         </a>
     {% endif %}
+    {% ui "admin_logout" as logout_label %}
     <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
         {% csrf_token %}
-        <button type="submit" aria-label="Log out" title="Log out">
+        <button type="submit" aria-label="{{ logout_label }}" title="{{ logout_label }}">
             <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
-            <span>Log out</span>
+            <span>{{ logout_label }}</span>
         </button>
     </form>
     {% include "admin/color_theme_toggle.html" %}

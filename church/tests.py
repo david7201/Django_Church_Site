@@ -248,6 +248,26 @@ class PublicSecurityTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], reverse("home"))
 
+    def test_language_next_parameter_allows_safe_admin_return(self):
+        admin_path = reverse("admin:index")
+
+        response = self.client.get(
+            reverse("set_language", kwargs={"language_code": "ro"}),
+            {"next": admin_path},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], admin_path)
+
+    def test_language_next_parameter_rejects_external_return(self):
+        response = self.client.get(
+            reverse("set_language", kwargs={"language_code": "ro"}),
+            {"next": "https://malicious.example/phishing"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("home"))
+
     def test_external_referrer_is_not_used_as_newsletter_redirect(self):
         response = self.client.post(
             reverse("newsletter_subscribe"),
@@ -461,6 +481,32 @@ class AccountAndAdminTests(TestCase):
         self.assertContains(response, "Communications")
         self.assertContains(response, "Fundraising and building")
         self.assertContains(response, "Quick actions")
+
+    def test_admin_dashboard_has_language_switcher_and_romanian_copy(self):
+        admin_user = User.objects.create_superuser(
+            username="adminlang",
+            email="adminlang@example.com",
+            password="Password123!",
+        )
+        self.client.force_login(admin_user)
+        admin_path = reverse("admin:index")
+
+        response = self.client.get(admin_path)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "/language/ro/?next=")
+        self.assertContains(response, "RO")
+        self.assertContains(response, "Mount Zion Admin")
+
+        self.client.get(
+            reverse("set_language", kwargs={"language_code": "ro"}),
+            {"next": admin_path},
+        )
+        response = self.client.get(admin_path)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Administrare Mount Zion")
+        self.assertContains(response, "Comunic")
+        self.assertContains(response, 'lang="ro">RO</a>')
 
     def test_staff_has_full_admin_access_but_cannot_change_or_delete_admins(self):
         owner = User.objects.create_superuser(

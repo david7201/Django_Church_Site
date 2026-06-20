@@ -78,7 +78,6 @@ MIDDLEWARE = [
     "church.middleware.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    "church.middleware.AdminEnglishMiddleware",
     "django.middleware.common.CommonMiddleware",
     "church.middleware.LocalDevelopmentOriginMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

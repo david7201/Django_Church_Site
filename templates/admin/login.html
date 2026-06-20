@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n static church_extras %}
 
-{% block title %}{% if form.errors %}Error: {% endif %}Admin sign in | Mount Zion{% endblock %}
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{% ui "admin_sign_in" %} | Mount Zion{% endblock %}
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">{{ form.media }}{% endblock %}
 {% block bodyclass %}{{ block.super }} login{% endblock %}
 {% block usertools %}{% endblock %}
@@ -12,7 +12,7 @@
 
 {% block content %}
 {% if form.errors and not form.non_field_errors %}
-    <p class="errornote">Please check the highlighted field and try again.</p>
+    <p class="errornote">{% ui "admin_check_highlighted" %}</p>
 {% endif %}
 
 {% if form.non_field_errors %}
@@ -23,14 +23,14 @@
 
 <div id="content-main">
     <div class="mz-login-intro">
-        <p class="mz-dashboard-kicker">Private administration</p>
-        <h1>Welcome back</h1>
-        <p>Sign in to manage the Mount Zion website.</p>
+        <p class="mz-dashboard-kicker">{% ui "admin_private_administration" %}</p>
+        <h1>{% ui "admin_welcome_back" %}</h1>
+        <p>{% ui "admin_signin_intro" %}</p>
     </div>
 
     {% if user.is_authenticated %}
         <p class="errornote">
-            You are signed in as {{ username }}, but this account cannot access the admin area.
+            {% ui "admin_no_access_prefix" %} {{ username }}, {% ui "admin_no_access_suffix" %}
         </p>
     {% endif %}
 
@@ -48,7 +48,8 @@
             <input type="hidden" name="next" value="{{ next }}">
         </div>
         <div class="submit-row">
-            <input type="submit" value="Sign in" class="default">
+            {% ui "admin_sign_in" as admin_sign_in_label %}
+            <input type="submit" value="{{ admin_sign_in_label }}" class="default">
         </div>
     </form>
 </div>

@@ -171,6 +171,35 @@ a {
     color: #fff;
 }
 
+.mz-admin-language-switcher {
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    color: #94a29f;
+    display: inline-flex;
+    gap: 5px;
+    min-height: 38px;
+    padding: 0 7px;
+    white-space: nowrap;
+}
+
+.mz-admin-language-switcher a {
+    border: 0 !important;
+    color: #cbd7d4 !important;
+    font-weight: 780 !important;
+    min-height: auto !important;
+    padding: 4px 5px !important;
+}
+
+.mz-admin-language-switcher a:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mz-admin-language-switcher a.is-active {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #fff !important;
+}
+
 #user-tools a,
 #user-tools button {
     align-items: center;
@@ -1402,6 +1431,15 @@ body.login .submit-row input {
 
     #user-tools {
         gap: 2px;
+    }
+
+    .mz-admin-language-switcher {
+        min-height: 34px;
+        padding: 0 5px;
+    }
+
+    .mz-admin-language-switcher a {
+        padding: 3px 4px !important;
     }
 
     #user-tools a,
