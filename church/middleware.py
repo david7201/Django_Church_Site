@@ -68,7 +68,7 @@ class SecurityHeadersMiddleware:
         if sensitive_path:
             response.headers["Cache-Control"] = "no-store, max-age=0"
             response.headers["Pragma"] = "no-cache"
-            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["Referrer-Policy"] = "same-origin"
         return response
 
 

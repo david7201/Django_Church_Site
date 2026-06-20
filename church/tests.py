@@ -263,7 +263,7 @@ class PublicSecurityTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Cache-Control"], "no-store, max-age=0")
-        self.assertEqual(response["Referrer-Policy"], "no-referrer")
+        self.assertEqual(response["Referrer-Policy"], "same-origin")
         self.assertIn("frame-ancestors 'none'", response["Content-Security-Policy"])
         self.assertIn("camera=()", response["Permissions-Policy"])
 
@@ -366,6 +366,27 @@ class PublicSecurityTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
+
+    @override_settings(DEBUG=False, ALLOWED_HOSTS=["localhost"])
+    def test_private_admin_https_post_accepts_same_origin_referer_without_origin(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        login_url = f"/{settings.PRIVATE_ADMIN_PREFIX}/dashboard/login/"
+        csrf_client.get(login_url, HTTP_HOST="localhost", secure=True)
+        token = csrf_client.cookies["csrftoken"].value
+
+        response = csrf_client.post(
+            login_url,
+            {
+                "username": "unknown-admin",
+                "password": "incorrect-password",
+                "csrfmiddlewaretoken": token,
+            },
+            HTTP_HOST="localhost",
+            HTTP_REFERER=f"https://localhost{login_url}",
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
 
 
 class AccountAndAdminTests(TestCase):
