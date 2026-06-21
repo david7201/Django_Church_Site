@@ -157,6 +157,35 @@ class BootstrapContentTests(TestCase):
         charity_response = self.client.get(reverse("charity"))
         self.assertContains(charity_response, 'href="#donations"')
 
+    def test_giving_tier_buttons_use_admin_configured_links(self):
+        campaign = FundraisingCampaign.objects.get(is_primary=True)
+        tiers_block = PageBlock.objects.get(page__slug="building", key="giving_tiers")
+        tiers_block.button_text_en = "Sponsor now"
+        tiers_block.button_url = "/charity/#donations"
+        tiers_block.save(update_fields=["button_text_en", "button_url", "updated_at"])
+
+        response = self.client.get(reverse("building_fund"))
+
+        self.assertContains(
+            response,
+            '<a href="/charity/#donations" class="btn btn-primary mt-3">Sponsor now</a>',
+            count=3,
+        )
+        self.assertContains(response, "Sponsor now", count=3)
+
+        tier = campaign.giving_tiers.first()
+        tier.button_url = "https://example.com/sponsor-chair"
+        tier.save(update_fields=["button_url", "updated_at"])
+
+        response = self.client.get(reverse("building_fund"))
+
+        self.assertContains(response, 'href="https://example.com/sponsor-chair"')
+        self.assertContains(
+            response,
+            '<a href="/charity/#donations" class="btn btn-primary mt-3">Sponsor now</a>',
+            count=2,
+        )
+
     def test_home_service_schedule_renders_as_structured_rows(self):
         response = self.client.get(reverse("home"))
 

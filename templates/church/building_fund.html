@@ -42,8 +42,9 @@
                                     <h3 class="h5 text-uppercase">{{ tier|tr:"title" }}</h3>
                                     <div class="giving-amount">{{ tier.amount|currency }}</div>
                                     <div class="text-black-50">{{ tier|tr:"description"|linebreaks }}</div>
-                                    {% if tier.button_url %}
-                                        <a href="{{ tier.button_url }}" class="btn btn-primary mt-3">{% firstof tiers_block|tr:"button_text" "Give" %}</a>
+                                    {% firstof tier.button_url tiers_block.button_url as sponsor_url %}
+                                    {% if sponsor_url %}
+                                        <a href="{{ sponsor_url }}" class="btn btn-primary mt-3">{% firstof tiers_block|tr:"button_text" "Give" %}</a>
                                     {% endif %}
                                 </div>
                             </div>

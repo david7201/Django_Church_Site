@@ -448,7 +448,13 @@ class GivingTierInline(admin.StackedInline):
     ordering = ("order",)
     fieldsets = (
         ("Website visibility", {"fields": ("is_visible",)}),
-        ("Giving tier", {"fields": ("title_en", "title_ro", "amount", "description_en", "description_ro", "button_url", "order")}),
+        (
+            "Giving tier",
+            {
+                "fields": ("title_en", "title_ro", "amount", "description_en", "description_ro", "button_url", "order"),
+                "description": "Optional: add the payment, donation, or sponsor link for this specific tier. If left blank, the section button link can be used instead.",
+            },
+        ),
         ("Publishing", {"fields": ("status", "visibility", "publish_at", "expires_at")}),
     )
 
